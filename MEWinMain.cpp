@@ -201,13 +201,13 @@ int ShowFailureWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszC
 	SetWindowTextA( editMessage, failure.c_str() );
 
 	HWND buttonAbort = GetDlgItem( hWnd, ID_BUTTON_ABORT );
-	EnableWindow( buttonAbort, retry );
+	EnableWindow( buttonAbort, abort );
 
 	HWND buttonRetry = GetDlgItem( hWnd, ID_BUTTON_RETRY );
 	EnableWindow( buttonRetry, retry );
 
 	HWND buttonIgnore = GetDlgItem( hWnd, ID_BUTTON_IGNORE );
-	EnableWindow( buttonIgnore, retry );
+	EnableWindow( buttonIgnore, ignore );
 
 	MSG msg{};
 	while (GetMessage( &msg, NULL, 0, 0 ))
@@ -245,53 +245,34 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		return -1;
 	}
 
-	try
+	me::os::OSParameters osParameters;
+	osParameters.hInstance = hInstance;
+	osParameters.hPrevInstance = hPrevInstance;
+	osParameters.cmdLine = lpszCmdLine;
+	osParameters.nCmdShow = nCmdShow;
+	osParameters.wndProc = WndProc; 
+
+	enum class Stage {
+		Initializing,
+		Running,
+		Exiting
+	} stage{ Stage::Initializing };
+
+	while( stage != Stage::Exiting )
 	{
-		me::os::OSParameters osParameters;
-		osParameters.hInstance = hInstance;
-		osParameters.hPrevInstance = hPrevInstance;
-		osParameters.lpszCmdLine = lpszCmdLine;
-		osParameters.nCmdShow = nCmdShow;
-		osParameters.wndProc = WndProc; 
-
-		bool retry = true;
-		while( retry )
+		bool allowRetry{ false };
+		try
 		{
-			retry = false;
-			try
+			if( stage == Stage::Initializing )
 			{
+				allowRetry = true;
 				gameInstance->Initialize( osParameters );
+				stage = Stage::Running; 
 			}
-			catch( std::exception exception )
+
+			if( stage == Stage::Running )
 			{
-				gameInstance->Debug()->LogLine( "Failure", "Mercury Failure:" );
-				gameInstance->Debug()->LogLine( "Failure", exception.what() );
-
-				int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, exception.what(), true, true, true );
-				switch( result )
-				{
-				case ID_BUTTON_ABORT:
-					GetGameInstance()->Debug()->LogLine( "Failure", "   Abort" );
-					return 0;
-
-				case ID_BUTTON_RETRY:
-					GetGameInstance()->Debug()->LogLine( "Failure", "   Retry" );
-					retry = true;
-					break;
-
-				case ID_BUTTON_IGNORE:
-					// Do nothing.
-					GetGameInstance()->Debug()->LogLine( "Failure", "   Ignore" );
-					break;
-				}
-			}
-		}
-
-		bool running = true;
-		while( running )
-		{ 
-			try
-			{
+				allowRetry = false;
 				while( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) == 1 )
 				{
 					if( msg.message == WM_QUIT )
@@ -310,37 +291,33 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 
 				gameInstance->Draw();
 			}
-			catch( std::exception exception )
+		}
+		catch (std::exception exception)
+		{
+			gameInstance->Debug()->LogSectionLine( "", "Mercury Failure:" );
+			gameInstance->Debug()->LogSectionLine( gameInstance->Debug()->GetBlocks(), exception.what() );
+		
+			std::string errorOutput{ gameInstance->Debug()->GetBlocks() + "\n" + exception.what() };
+			int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, errorOutput, true, allowRetry, true );
+			switch (result)
 			{
-				gameInstance->Debug()->LogLine( "Failure", "Mercury Failure: " );
-				gameInstance->Debug()->LogLine( "Failure", exception.what() );
+			case ID_BUTTON_ABORT:
+				GetGameInstance()->Debug()->LogSectionLine( "", "   *User Aborted*" );
+				stage = Stage::Exiting;
+				return -1;
 
-				int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, exception.what(), true, false, true );
-				switch (result)
-				{
-				case ID_BUTTON_ABORT:
-					GetGameInstance()->Debug()->LogLine( "Failure", "   Abort" );
-					return -1;
+			case ID_BUTTON_RETRY:
+				GetGameInstance()->Debug()->LogSectionLine( "", "   *Retry*" );
+				break;
 
-				case ID_BUTTON_RETRY:
-					// TODO:
-					break;
-
-				case ID_BUTTON_IGNORE:
-					// Do nothing.
-					GetGameInstance()->Debug()->LogLine( "Failure", "   Ignore" );
-					break;
-				}
+			case ID_BUTTON_IGNORE:
+				// Do nothing.
+				GetGameInstance()->Debug()->LogSectionLine( "", "   *Ignore*" );
+				break;
 			}
 		}
 	}
-	catch( std::exception exception )
-	{
-		gameInstance->Debug()->LogLine( "Failure", "Mercury Failure:" );
-		gameInstance->Debug()->LogLine( "Failure", exception.what() );
-		MessageBoxA( 0, exception.what(), "Mercury Failure", MB_ICONEXCLAMATION );
-		return -1;
-	}
+
  
     return msg.wParam; 
 } 
