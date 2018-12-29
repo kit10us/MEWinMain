@@ -295,9 +295,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		catch (std::exception exception)
 		{
 			gameInstance->Debug()->LogSectionLine( "", "Mercury Failure:" );
-			gameInstance->Debug()->LogSectionLine( gameInstance->Debug()->GetBlocks(), exception.what() );
+			gameInstance->Debug()->LogSectionLine( gameInstance->Debug()->GetBlocks( "\n" ), exception.what() );
 		
-			std::string errorOutput{ gameInstance->Debug()->GetBlocks() + "\n" + exception.what() };
+			std::string errorOutput{ gameInstance->Debug()->GetBlocks( "\r\n" ) + exception.what() };
 			int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, errorOutput, true, allowRetry, true );
 			switch (result)
 			{
