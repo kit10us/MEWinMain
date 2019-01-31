@@ -3,6 +3,7 @@
 
 #include <mewos/WindowsOS.h>
 #include <me/game/Game.h>
+#include <me/debug/IDebug.h>
 #include <WndProc.h>
 
 #define WINDOWS_LEAN_AND_MEAN
@@ -17,218 +18,18 @@
 #undef max
 #endif
 #ifdef min
-#undef min
+#undef min	
 #endif
 
 #include <shellapi.h>
 
 extern "C" LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
-
-#define ID_EDIT_MESSAGE		100
-#define ID_BUTTON_ABORT		101
-#define ID_BUTTON_RETRY		102
-#define ID_BUTTON_IGNORE	103
-
-int s_failureWindowResult {};
-
-extern "C"
-LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
-{
-	switch (message)
-	{
-	case WM_CREATE:
-	{
-		HINSTANCE hInstace = (HINSTANCE)GetWindowLong( hWnd, GWL_HINSTANCE );
-
-		const int padding = 5;
-		RECT parentRect {};
-		GetClientRect( hWnd, &parentRect );
-
-		int childWidth = parentRect.right - padding * 2;
-		int top = padding;
-		int buttonHeight = 25;
-		int buttonWidth = (childWidth / 3) - padding * 2;
-		int editHeight = parentRect.bottom - parentRect.top - padding * 3 - buttonHeight;
-
-		CreateWindowW(
-			L"Edit",
-			0,
-			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL | WS_BORDER,
-			padding, top, childWidth, editHeight,
-			hWnd,
-			(HMENU)ID_EDIT_MESSAGE,
-			hInstace,
-			0 );
-		top += editHeight + padding;
-		
-		int buttonLeft = padding;
-		CreateWindowW(
-			L"Button",
-			L"Abort",
-			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-			buttonLeft, top, buttonWidth, buttonHeight,
-			hWnd,
-			(HMENU)ID_BUTTON_ABORT,
-			hInstace,
-			0 );
-		buttonLeft += buttonWidth + padding;
-
-		CreateWindowW(
-			L"Button",
-			L"Retry",
-			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-			buttonLeft, top, buttonWidth, buttonHeight,
-			hWnd,
-			(HMENU)ID_BUTTON_RETRY,
-			hInstace,
-			0 );
-		buttonLeft += buttonWidth + padding;
-
-		CreateWindowW(
-			L"Button",
-			L"Ignore",
-			WS_CHILD | WS_VISIBLE | WS_TABSTOP,
-			buttonLeft, top, buttonWidth, buttonHeight,
-			hWnd,
-			(HMENU)ID_BUTTON_IGNORE,
-			hInstace,
-			0 );
-		buttonLeft += buttonWidth + padding;
-		top += buttonHeight;
-		return 0;
-	}
-
-	case WM_KEYDOWN:
-	if (wParam == VK_ESCAPE)
-	{
-		//TesterBase::s_tester->RequestQuit();
-		return 0;
-	}
-
-	case WM_COMMAND:
-	{
-		if( lParam )
-		{
-			int controlId = (int)LOWORD( wParam );
-			int controlMessage = (int)HIWORD( wParam );
-			switch( controlId )
-			{
-			case ID_BUTTON_ABORT:
-			{
-				s_failureWindowResult = controlId;
-				PostQuitMessage( 0 );	
-				break;
-			}
-
-			case ID_BUTTON_RETRY:
-			{
-				s_failureWindowResult = controlId;
-				PostQuitMessage( 0 );
-				break;
-			}
-
-			case ID_BUTTON_IGNORE:
-			{
-				s_failureWindowResult = controlId;
-				PostQuitMessage( 0 );
-				break;
-			}
-
-			default:
-				break;
-			}
-		}
-		break;
-	}
-
-	case WM_CLOSE: // Fall through to WM_DESTROY...
-	{
-		PostQuitMessage( 0 );
-		return 0;
-	}
-
-	case WM_DESTROY:
-	{
-		return 0;
-	}
-
-	default:
-		return DefWindowProc( hWnd, message, wParam, lParam );
-	}
-	return 0;
-}
-
-int ShowFailureWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow, std::string failure, bool abort, bool retry, bool ignore )
-{
-	HWND activeWindow = GetActiveWindow();
-	EnableWindow( activeWindow, false );
-
-	const wchar_t * CLASS_NAME{ L"MercuryFailureWindowClass" };
-
-	WNDCLASS wc{};
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-
-	wc.lpfnWndProc = (WNDPROC)WndProcFailureWindow;
-	wc.hInstance = hInstance;
-	wc.lpszClassName = L"MercuryFailureWindowClass";
-	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-
-	if (!RegisterClass( &wc ))
-	{
-		throw;
-	}
-
-	HWND hWnd = CreateWindowW(
-		CLASS_NAME,
-		L"Mercury failure",
-		WS_CAPTION | WS_MINIMIZEBOX | WS_BORDER | WS_SYSMENU,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		430, 300,
-		0,
-		0,
-		hInstance,
-		0 );
-	if (!hWnd)
-	{
-		throw;
-	}
-
-	ShowWindow( hWnd, nCmdShow );
-	UpdateWindow( hWnd );
-
-	HWND editMessage = GetDlgItem( hWnd, ID_EDIT_MESSAGE );
-	SetWindowTextA( editMessage, failure.c_str() );
-
-	HWND buttonAbort = GetDlgItem( hWnd, ID_BUTTON_ABORT );
-	EnableWindow( buttonAbort, abort );
-
-	HWND buttonRetry = GetDlgItem( hWnd, ID_BUTTON_RETRY );
-	EnableWindow( buttonRetry, retry );
-
-	HWND buttonIgnore = GetDlgItem( hWnd, ID_BUTTON_IGNORE );
-	EnableWindow( buttonIgnore, ignore );
-
-	MSG msg{};
-	while (GetMessage( &msg, NULL, 0, 0 ))
-	{
-		TranslateMessage( &msg );
-		DispatchMessage( &msg );
-	}
-
-	DestroyWindow( hWnd );
-
-	EnableWindow( activeWindow, true );
-	SetActiveWindow( activeWindow );
-
-	return s_failureWindowResult;
-}
-
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow )
 {
 	MSG msg;
 
-	static me::game::Game * gameInstance;
+	static me::game::IGame * gameInstance;
 
 	try
 	{
@@ -294,27 +95,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		}
 		catch (std::exception exception)
 		{
-			gameInstance->Debug()->LogSectionLine( "", "Mercury Failure:" );
-			gameInstance->Debug()->LogSectionLine( gameInstance->Debug()->GetBlocks( "\n" ), exception.what() );
-		
-			std::string errorOutput{ gameInstance->Debug()->GetBlocks( "\r\n" ) + exception.what() };
-			int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, errorOutput, true, allowRetry, true );
-			switch (result)
-			{
-			case ID_BUTTON_ABORT:
-				GetGameInstance()->Debug()->LogSectionLine( "", "   *User Aborted*" );
-				stage = Stage::Exiting;
-				return -1;
-
-			case ID_BUTTON_RETRY:
-				GetGameInstance()->Debug()->LogSectionLine( "", "   *Retry*" );
-				break;
-
-			case ID_BUTTON_IGNORE:
-				// Do nothing.
-				GetGameInstance()->Debug()->LogSectionLine( "", "   *Ignore*" );
-				break;
-			}
+			return -1;
 		}
 	}
 
