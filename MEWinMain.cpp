@@ -1,4 +1,4 @@
-// Copyright (c) 2002 - 2018, Evil Quail LLC
+// Copyright (c) 2002 - 2018, Kit10 Studios LLC
 // All Rights Reserved
 
 #include <mewos/WindowsOS.h>
@@ -46,12 +46,64 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		return -1;
 	}
 
-	me::os::OSParameters osParameters;
+	unify::Path runPath;
+	{
+		char buffer[MAX_PATH];
+		GetCurrentDirectoryA( MAX_PATH, buffer );
+		runPath = unify::Path( std::string( buffer ) + "/" );
+	}
+
+	unify::Path programPath;
+	{
+		using namespace std;
+		char buffer[MAX_PATH];
+		GetModuleFileNameA( NULL, buffer, MAX_PATH );
+		programPath = unify::Path( buffer );
+		programPath.Normalize();
+	}
+
+
+	std::vector< std::string > arguments;
+	{
+		std::string cmdLine = lpszCmdLine;
+		size_t l = 0;
+		size_t r = 0;
+		bool inQuote = false;
+		std::string working;
+
+		for( size_t l = 0, r = 0; r <= cmdLine.length(); ++r )
+		{
+			if( !inQuote && (r == cmdLine.length() || cmdLine.at( r ) == ' ') )
+			{
+				if( l != r )
+				{
+					working += cmdLine.substr( l, r - l );
+				}
+				if( working.empty() == false )
+				{
+					arguments.push_back( working );
+					working.clear();
+				}
+				l = r + 1;
+			}
+			else if( cmdLine.at( r ) == '\"' )
+			{
+				// Include partial string...
+				working += cmdLine.substr( l, r - l );
+				l = r + 1; // One past the double quote.
+				inQuote = !inQuote;
+			}
+		}
+	}
+
+
+	me::os::OSParameters osParameters( runPath, programPath, arguments );
+	//osParameters.hWnd = hWnd;
 	osParameters.hInstance = hInstance;
 	osParameters.hPrevInstance = hPrevInstance;
-	osParameters.cmdLine = lpszCmdLine;
 	osParameters.nCmdShow = nCmdShow;
-	osParameters.wndProc = WndProc; 
+	osParameters.wndProc = WndProc;
+	
 
 	enum class Stage {
 		Initializing,
@@ -95,6 +147,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		}
 		catch (std::exception exception)
 		{
+			gameInstance->Debug()->ReportError( me::ErrorLevel::Critical, "MEWinMain", exception.what(), false, false );
 			return -1;
 		}
 	}
