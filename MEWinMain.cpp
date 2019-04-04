@@ -4,6 +4,7 @@
 #include <mewos/WindowsOS.h>
 #include <me/game/Game.h>
 #include <me/debug/IDebug.h>
+#include <me/exception/Handled.h>
 #include <WndProc.h>
 
 #define WINDOWS_LEAN_AND_MEAN
@@ -145,9 +146,18 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 				gameInstance->Draw();
 			}
 		}
-		catch (std::exception exception)
+		catch( me::exception::Handled & )
 		{
-			gameInstance->Debug()->ReportError( me::ErrorLevel::Critical, "MEWinMain", exception.what(), false, false );
+			return -1;
+		}
+		catch( std::exception exception )
+		{
+			gameInstance->Debug()->ReportError( me::ErrorLevel::Engine, "MEWinMain", exception.what(), false, false );
+			return -1;
+		}
+		catch( ... )
+		{
+			gameInstance->Debug()->ReportError( me::ErrorLevel::Engine, "MEWinMain", "Unknown exception", false, false );
 			return -1;
 		}
 	}
