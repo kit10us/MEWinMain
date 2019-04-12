@@ -12,10 +12,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MEWinMain.cpp" />
+    <ClCompile Include="mewos\Debug.cpp" />
+    <ClCompile Include="mewos\Extension.cpp" />
+    <ClCompile Include="mewos\WindowsOS.cpp" />
     <ClCompile Include="WndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MEWinMain.h" />
+    <ClInclude Include="mewos\Debug.h" />
+    <ClInclude Include="mewos\Extension.h" />
+    <ClInclude Include="mewos\WindowsOS.h" />
     <ClInclude Include="WndProc.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -3,9 +3,32 @@
   <ItemGroup>
     <ClCompile Include="WndProc.cpp" />
     <ClCompile Include="MEWinMain.cpp" />
+    <ClCompile Include="mewos\WindowsOS.cpp">
+      <Filter>mewos</Filter>
+    </ClCompile>
+    <ClCompile Include="mewos\Debug.cpp">
+      <Filter>mewos</Filter>
+    </ClCompile>
+    <ClCompile Include="mewos\Extension.cpp">
+      <Filter>mewos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WndProc.h" />
     <ClInclude Include="MEWinMain.h" />
+    <ClInclude Include="mewos\WindowsOS.h">
+      <Filter>mewos</Filter>
+    </ClInclude>
+    <ClInclude Include="mewos\Debug.h">
+      <Filter>mewos</Filter>
+    </ClInclude>
+    <ClInclude Include="mewos\Extension.h">
+      <Filter>mewos</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="mewos">
+      <UniqueIdentifier>{c0f02a9e-19be-4ed9-9ee3-7b4254ea9e10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

@@ -26,15 +26,79 @@
 
 extern "C" LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
+void Deleter( mewos::IWindowsOS * factory )
+{
+	delete factory;
+}
+
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow )
 {
 	MSG msg;
 
-	static me::game::IGame * gameInstance;
+	me::game::IGame * gameInstance;
+	me::os::IOS::ptr os;
 
 	try
 	{
+
+		unify::Path runPath;
+		{
+			char buffer[MAX_PATH];
+			GetCurrentDirectoryA( MAX_PATH, buffer );
+			runPath = unify::Path( std::string( buffer ) + "/" );
+		}
+
+		unify::Path programPath;
+		{
+			using namespace std;
+			char buffer[MAX_PATH];
+			GetModuleFileNameA( NULL, buffer, MAX_PATH );
+			programPath = unify::Path( buffer );
+			programPath.Normalize();
+		}
+
+
+		std::vector< std::string > arguments;
+		{
+			std::string cmdLine = lpszCmdLine;
+			size_t l = 0;
+			size_t r = 0;
+			bool inQuote = false;
+			std::string working;
+
+			for( size_t l = 0, r = 0; r <= cmdLine.length(); ++r )
+			{
+				if( !inQuote && (r == cmdLine.length() || cmdLine.at( r ) == ' ') )
+				{
+					if( l != r )
+					{
+						working += cmdLine.substr( l, r - l );
+					}
+					if( working.empty() == false )
+					{
+						arguments.push_back( working );
+						working.clear();
+					}
+					l = r + 1;
+				}
+				else if( cmdLine.at( r ) == '\"' )
+				{
+					// Include partial string...
+					working += cmdLine.substr( l, r - l );
+					l = r + 1; // One past the double quote.
+					inQuote = !inQuote;
+				}
+			}
+		}
+
+		me::os::OSParameters osParameters( runPath, programPath, arguments );
+		osParameters.hInstance = hInstance;
+		osParameters.hPrevInstance = hPrevInstance;
+		osParameters.nCmdShow = nCmdShow;
+		osParameters.wndProc = WndProc;
+
 		gameInstance = GetGameInstance();
+		os.reset( new mewos::WindowsOS( gameInstance, osParameters ) );
 	}
 	catch( std::exception exception )
 	{
@@ -46,65 +110,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		MessageBoxA( 0, exception.what(), "Mercury Failure", MB_ICONEXCLAMATION );
 		return -1;
 	}
-
-	unify::Path runPath;
-	{
-		char buffer[MAX_PATH];
-		GetCurrentDirectoryA( MAX_PATH, buffer );
-		runPath = unify::Path( std::string( buffer ) + "/" );
-	}
-
-	unify::Path programPath;
-	{
-		using namespace std;
-		char buffer[MAX_PATH];
-		GetModuleFileNameA( NULL, buffer, MAX_PATH );
-		programPath = unify::Path( buffer );
-		programPath.Normalize();
-	}
-
-
-	std::vector< std::string > arguments;
-	{
-		std::string cmdLine = lpszCmdLine;
-		size_t l = 0;
-		size_t r = 0;
-		bool inQuote = false;
-		std::string working;
-
-		for( size_t l = 0, r = 0; r <= cmdLine.length(); ++r )
-		{
-			if( !inQuote && (r == cmdLine.length() || cmdLine.at( r ) == ' ') )
-			{
-				if( l != r )
-				{
-					working += cmdLine.substr( l, r - l );
-				}
-				if( working.empty() == false )
-				{
-					arguments.push_back( working );
-					working.clear();
-				}
-				l = r + 1;
-			}
-			else if( cmdLine.at( r ) == '\"' )
-			{
-				// Include partial string...
-				working += cmdLine.substr( l, r - l );
-				l = r + 1; // One past the double quote.
-				inQuote = !inQuote;
-			}
-		}
-	}
-
-
-	me::os::OSParameters osParameters( runPath, programPath, arguments );
-	//osParameters.hWnd = hWnd;
-	osParameters.hInstance = hInstance;
-	osParameters.hPrevInstance = hPrevInstance;
-	osParameters.nCmdShow = nCmdShow;
-	osParameters.wndProc = WndProc;
-	
 
 	enum class Stage {
 		Initializing,
@@ -120,7 +125,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 			if( stage == Stage::Initializing )
 			{
 				allowRetry = true;
-				gameInstance->Initialize( osParameters );
+				gameInstance->Initialize( os );
 				stage = Stage::Running; 
 			}
 
