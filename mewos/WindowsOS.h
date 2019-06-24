@@ -58,7 +58,7 @@ namespace mewos
 
 	private:
 		me::game::IGame * m_game;
-		me::debug::IDebug * m_debug;
+		me::debug::IDebug::ptr m_debug;
 		me::render::IRendererFactory::ptr m_rendererFactory;
 		std::string m_name;
 		me::input::IInputDevice * m_keyboard;

@@ -24,7 +24,7 @@ using namespace mewos;
 
 WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters )
 	: m_game{ game }
-	, m_debug{ new debug::DefaultDebug{} }
+	, m_debug{ new mewos::Debug( this ) }
 	, m_keyboard{}
 	, m_hasFocus{}
 	, m_mouse{}
@@ -144,12 +144,12 @@ me::game::IGame * WindowsOS::GetGame()
 
 me::debug::IDebug * WindowsOS::Debug()
 {
-	return m_debug;
+	return m_debug.get();
 }
 
 const me::debug::IDebug * WindowsOS::Debug() const
 {
-	return m_debug;
+	return m_debug.get();
 }
 
 void * WindowsOS::Feed( std::string target, void * data )

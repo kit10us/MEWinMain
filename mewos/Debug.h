@@ -15,10 +15,10 @@ namespace mewos
 {
 	class Debug : public me::debug::DefaultDebug
 	{
-		me::os::IOS * m_os;
+		mewos::IWindowsOS * m_os;
 		size_t m_flushedLogLines;
 	public:
-		Debug( me::os::IOS * os, me::debug::DefaultDebug & defaulDebug );
+		Debug( mewos::IWindowsOS * os );
 		virtual ~Debug();
 
 		void LogSectionLine( std::string section, std::string line ) override;

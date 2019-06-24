@@ -248,12 +248,11 @@ public:
 	}
 };
 
-Debug::Debug( me::os::IOS * os, me::debug::DefaultDebug & defaultDebug )
-	: DefaultDebug{ defaultDebug }
-	, m_os{ os }
+Debug::Debug( mewos::IWindowsOS * os )
+	: m_os{ os }
 	, m_flushedLogLines{}
 {
-	SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler( dynamic_cast< mewos::IWindowsOS * >( os ) ) } );
+	SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler(  os ) } );
 }
 
 Debug::~Debug()	
