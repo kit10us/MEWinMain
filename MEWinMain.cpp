@@ -26,7 +26,7 @@
 
 extern "C" LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
-void Deleter( mewos::IWindowsOS * factory )
+void Deleter( mewos::WindowsOS * factory )
 {
 	delete factory;
 }

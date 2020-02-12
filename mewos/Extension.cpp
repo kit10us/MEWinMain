@@ -28,10 +28,11 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 	: m_moduleHandle{}
 {
 	using namespace me;
+	auto debug = gameInstance->Debug();
 
-	debug::Block( gameInstance->GetOS()->Debug(), "Extension::Create( \"" + source.ToString() + "\" )" );
+	debug::Block rb( debug, "Extension::Create( \"" + source.ToString() + "\" )" );
 	m_source = source;
-	gameInstance->GetOS()->Debug()->Try( [&]
+	debug->Try( [&]
 	{
 		if( !m_source.Exists() )
 		{
@@ -39,7 +40,7 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 		}
 	}, ErrorLevel::Extension, false, true );
 
-	gameInstance->GetOS()->Debug()->Try( [&]
+	debug->Try( [&]
 	{
 		m_moduleHandle = LoadLibraryA( m_source.ToString().c_str() );
 		if( !m_moduleHandle )
@@ -58,10 +59,10 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 
 	LoaderFunction loader{};
 	{
-		debug::Block block( gameInstance->Debug(), "MELoader" );
+		debug::Block block( debug, "MELoader" );
 		loader = (LoaderFunction)GetProcAddress( (HMODULE)m_moduleHandle, "MELoader" );
 
-		gameInstance->Debug()->Try( [&]
+		debug->Try( [&]
 		{
 			if( !loader )
 			{
@@ -71,7 +72,7 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 			}
 		}, ErrorLevel::Extension, false, false );
 
-		gameInstance->Debug()->Try( [&]
+		debug->Try( [&]
 		{
 			loader( gameInstance, element );
 		}, ErrorLevel::Extension, false, false );

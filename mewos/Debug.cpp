@@ -210,10 +210,10 @@ int ShowFailureWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszC
 
 class ErrorHandler : public me::debug::IErrorHandler
 {
-	mewos::IWindowsOS * m_os;
+	mewos::WindowsOS * m_os;
 
 public:
-	ErrorHandler( mewos::IWindowsOS * os )
+	ErrorHandler( mewos::WindowsOS * os )
 		: m_os{ os }
 	{
 	}
@@ -225,7 +225,7 @@ public:
 		LPSTR lpszCmdLine = (LPSTR)m_os->GetOSParameters()->cmdLine.c_str();
 		int nCmdShow = (int)m_os->GetOSParameters()->nCmdShow;
 
-		std::string errorOutput{ m_os->Debug()->GetBlocks( "\r\n" ) + error };
+		std::string errorOutput{ m_os->Debug()->GetBlocksText() + error };
 		int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, errorOutput, true, canRetry, canContinue );
 		switch( result )
 		{
@@ -248,25 +248,27 @@ public:
 	}
 };
 
-Debug::Debug( mewos::IWindowsOS * os )
+Debug::Debug( WindowsOS * os )
 	: m_os{ os }
-	, m_flushedLogLines{}
+	//, m_flushedLogLines{}
 {
-	SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler(  os ) } );
+	SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler( os ) } );
 }
 
 Debug::~Debug()	
 {
 }
-
+/*
 void Debug::LogSectionLine( std::string section, std::string line )
 {
 	DefaultDebug::LogSectionLine( section, line );
 	Flush();
 }
+*/
 
 void Debug::Flush()
 {
+	/*
 	if (m_logFile.Empty()) return;
 
 	using namespace std;
@@ -284,4 +286,5 @@ void Debug::Flush()
 			listener->Log( text );
 		}
 	}
+	*/
 }

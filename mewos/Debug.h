@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <mewos/IWindowsOS.h>
+#include <mewos/WindowsOS.h>
 #include <me/debug/DefaultDebug.h>
 #include <unify/Path.h>
 #include <list>
@@ -15,13 +15,13 @@ namespace mewos
 {
 	class Debug : public me::debug::DefaultDebug
 	{
-		mewos::IWindowsOS * m_os;
-		size_t m_flushedLogLines;
+		WindowsOS * m_os;
+		//size_t m_flushedLogLines;
 	public:
-		Debug( mewos::IWindowsOS * os );
+		Debug( WindowsOS * os );
 		virtual ~Debug();
 
-		void LogSectionLine( std::string section, std::string line ) override;
+		//void LogSectionLine( std::string section, std::string line ) override;
 
 		/// <summary>
 		/// Flush log lines by outputting lines logged, and ensuring our logged lines are consumed.

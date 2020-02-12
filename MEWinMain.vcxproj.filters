@@ -25,6 +25,9 @@
     <ClInclude Include="mewos\Extension.h">
       <Filter>mewos</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\MEWinMain\mewos\IWindowsOS.h">
+      <Filter>mewos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="mewos">
