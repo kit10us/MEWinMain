@@ -69,6 +69,5 @@ namespace mewos
 		std::vector< me::render::IRenderer::ptr > m_renderers;
 		me::os::OSParameters m_osParameters;
 		rm::AssetPaths::ptr m_assetPaths;
-		HWND m_mainWindow;
 	};
 }

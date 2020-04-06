@@ -2,6 +2,7 @@
 // All Rights Reserved
 
 #include <mewos/WindowsOS.h>
+#include <mewos/OutputDebugStringLogListener.h>
 #include <me/game/Game.h>
 #include <me/debug/IDebug.h>
 #include <me/exception/Handled.h>
@@ -33,10 +34,12 @@ void Deleter( mewos::WindowsOS * factory )
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow )
 {
+	using namespace mewos;
 	MSG msg;
 
 	me::game::IGame * gameInstance;
 	me::os::IOS::ptr os;
+	std::shared_ptr< OutputDebugStringLogListener > outputDebugStringLogListener;
 
 	try
 	{
@@ -99,6 +102,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 
 		gameInstance = GetGameInstance();
 		os.reset( new mewos::WindowsOS( gameInstance, osParameters ) );
+		os->Debug()->GetLogger()->AttachListener( kit::ILogListener::ptr( new OutputDebugStringLogListener ) );
 	}
 	catch( std::exception exception )
 	{
@@ -126,6 +130,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 			{
 				allowRetry = true;
 				gameInstance->Initialize( os );
+				gameInstance->Debug()->GetLogger()->Log( "After exiting init." );
 				stage = Stage::Running; 
 			}
 
@@ -157,12 +162,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		}
 		catch( std::exception exception )
 		{
-			gameInstance->Debug()->ReportError( me::ErrorLevel::Engine, "MEWinMain", exception.what(), false, false );
+			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "MEWinMain", exception.what(), false, false );
 			return -1;
 		}
 		catch( ... )
 		{
-			gameInstance->Debug()->ReportError( me::ErrorLevel::Engine, "MEWinMain", "Unknown exception", false, false );
+			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "MEWinMain", "Unknown exception", false, false );
 			return -1;
 		}
 	}

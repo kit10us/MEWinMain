@@ -2,7 +2,6 @@
 // All Rights Reserved
 
 #include <mewos/Extension.h>
-#include <me/debug/Block.h>
 #include <me/exception/FileNotFound.h>
 
 #define WINDOWS_LEAN_AND_MEAN
@@ -24,13 +23,13 @@ using namespace mewos;
 
 typedef bool( __cdecl *LoaderFunction )(me::game::IGame *, const qxml::Element * element);
 
-Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const qxml::Element * element )
+Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element )
 	: m_moduleHandle{}
 {
 	using namespace me;
 	auto debug = gameInstance->Debug();
 
-	debug::Block rb( debug, "Extension::Create( \"" + source.ToString() + "\" )" );
+	auto rb{ debug->MakeBlock( "Extension::Create( \"" + source.ToString() + "\" )" ) };
 	m_source = source;
 	debug->Try( [&]
 	{
@@ -38,7 +37,7 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 		{
 			throw exception::FileNotFound( m_source );
 		}
-	}, ErrorLevel::Extension, false, true );
+	}, debug::ErrorLevel::Extension, false, true );
 
 	debug->Try( [&]
 	{
@@ -55,11 +54,11 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 				throw unify::Exception( "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + unify::Cast< std::string >( errorCode ) + ")!" );
 			}
 		}
-	}, ErrorLevel::Extension, false, true );
+	}, debug::ErrorLevel::Extension, false, true );
 
 	LoaderFunction loader{};
 	{
-		debug::Block block( debug, "MELoader" );
+		auto block{ debug->MakeBlock( "MELoader" ) };
 		loader = (LoaderFunction)GetProcAddress( (HMODULE)m_moduleHandle, "MELoader" );
 
 		debug->Try( [&]
@@ -70,12 +69,12 @@ Extension::Extension( me::game::IGame * gameInstance, unify::Path source, const 
 				m_moduleHandle = 0;
 				throw unify::Exception( "Extension, \"" + m_source.ToString() + "\" loaded, however MELoader not found!" );
 			}
-		}, ErrorLevel::Extension, false, false );
+		}, debug::ErrorLevel::Extension, false, false );
 
 		debug->Try( [&]
 		{
 			loader( gameInstance, element );
-		}, ErrorLevel::Extension, false, false );
+		}, debug::ErrorLevel::Extension, false, false );
 	}
 }
 
