@@ -25,11 +25,12 @@ typedef bool( __cdecl *LoaderFunction )(me::game::IGame *, const qxml::Element *
 
 Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element )
 	: m_moduleHandle{}
+	, m_block{ gameInstance->Debug()->GetLogger()->CreateBlock( "Extension \"" + source.Filename() + "\"" ) }
 {
 	using namespace me;
 	auto debug = gameInstance->Debug();
+	auto block{ m_block->SubBlock( "ctor" ) };
 
-	auto rb{ debug->MakeBlock( "Extension::Create( \"" + source.ToString() + "\" )" ) };
 	m_source = source;
 	debug->Try( [&]
 	{
@@ -40,25 +41,26 @@ Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const q
 	}, debug::ErrorLevel::Extension, false, true );
 
 	debug->Try( [&]
-	{
-		m_moduleHandle = LoadLibraryA( m_source.ToString().c_str() );
-		if( !m_moduleHandle )
 		{
-			DWORD errorCode = GetLastError();
-			if( errorCode == ERROR_MOD_NOT_FOUND )
+			block->Log( "Loading library module." );
+			m_moduleHandle = LoadLibraryA( m_source.ToString().c_str() );
+			if( !m_moduleHandle )
 			{
-				throw unify::Exception( "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured due to likely missing dependency (missing another DLL)!" );
+				DWORD errorCode = GetLastError();
+				if( errorCode == ERROR_MOD_NOT_FOUND )
+				{
+					throw unify::Exception( "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured due to likely missing dependency (missing another DLL)!" );
+				}
+				else
+				{
+					throw unify::Exception( "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + unify::Cast< std::string >( errorCode ) + ")!" );
+				}
 			}
-			else
-			{
-				throw unify::Exception( "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + unify::Cast< std::string >( errorCode ) + ")!" );
-			}
-		}
-	}, debug::ErrorLevel::Extension, false, true );
+		}, debug::ErrorLevel::Extension, false, true );
 
 	LoaderFunction loader{};
 	{
-		auto block{ debug->MakeBlock( "MELoader" ) };
+		block->Log( "Getting MELoader." );
 		loader = (LoaderFunction)GetProcAddress( (HMODULE)m_moduleHandle, "MELoader" );
 
 		debug->Try( [&]
@@ -71,6 +73,7 @@ Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const q
 			}
 		}, debug::ErrorLevel::Extension, false, false );
 
+		block->Log( "Executing loader" );
 		debug->Try( [&]
 		{
 			loader( gameInstance, element );

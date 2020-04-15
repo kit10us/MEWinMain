@@ -15,6 +15,6 @@ namespace mewos
 	public:
 		ErrorHandler( mewos::WindowsOS* os );
 
-		me::debug::ReportErrorResult ReportError( me::debug::ErrorLevel level, std::string source, std::string error, bool canContinue, bool canRetry ) override;
+		me::debug::ReportErrorResult ReportError( me::debug::ErrorLevel level, std::string error, bool canContinue, bool canRetry ) override;
 	};
 }

@@ -102,7 +102,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 
 		gameInstance = GetGameInstance();
 		os.reset( new mewos::WindowsOS( gameInstance, osParameters ) );
-		os->Debug()->GetLogger()->AttachListener( kit::ILogListener::ptr( new OutputDebugStringLogListener ) );
+		os->Debug()->GetLogger()->AttachListener( kit::debug::ILogListener::ptr( new OutputDebugStringLogListener ) );
 	}
 	catch( std::exception exception )
 	{
@@ -162,12 +162,12 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		}
 		catch( std::exception exception )
 		{
-			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "MEWinMain", exception.what(), false, false );
+			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, exception.what(), false, false );
 			return -1;
 		}
 		catch( ... )
 		{
-			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "MEWinMain", "Unknown exception", false, false );
+			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "Unknown exception", false, false );
 			return -1;
 		}
 	}

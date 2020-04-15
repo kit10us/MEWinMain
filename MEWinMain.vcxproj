@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MEWinMain.cpp" />
-    <ClCompile Include="mewos\Debug.cpp" />
     <ClCompile Include="mewos\ErrorHandler.cpp" />
     <ClCompile Include="mewos\Extension.cpp" />
     <ClCompile Include="mewos\OutputDebugStringLogListener.cpp" />
@@ -22,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\MEWinMain\mewos\IWindowsOS.h" />
     <ClInclude Include="MEWinMain.h" />
-    <ClInclude Include="mewos\Debug.h" />
     <ClInclude Include="mewos\ErrorHandler.h" />
     <ClInclude Include="mewos\Extension.h" />
     <ClInclude Include="mewos\OutputDebugStringLogListener.h" />
@@ -78,6 +76,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)unify;$(SolutionDir)kitlogger;$(SolutionDir)qxml;$(SolutionDir)qjson;$(SolutionDir)ResourceManager;$(SolutionDir)MEWindowsOS;$(SolutionDir)MercuryEngine;%(AdditionalLibraryDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,6 +95,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>DIRECTX9;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)unify;$(SolutionDir)kitlogger;$(SolutionDir)qxml;$(SolutionDir)qjson;$(SolutionDir)ResourceManager;$(SolutionDir)MEWindowsOS;$(SolutionDir)MercuryEngine;%(AdditionalLibraryDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

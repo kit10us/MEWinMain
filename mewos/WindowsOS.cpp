@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <mewos/Debug.h>
 #include <mewos/WindowsOS.h>
 #include <mewos/Extension.h>
 #include <mewos/ErrorHandler.h>
+#include <me/debug/DefaultDebug.h>
 #include <me/exception/FailedToCreate.h>
 #include <me/exception/FileNotFound.h>
 #include <unify/Exception.h>
@@ -22,14 +22,16 @@ using namespace mewos;
 
 WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters )
 	: m_game{ game }
-	, m_debug{ new mewos::Debug( this ) }
+	, m_debug{ new me::debug::DefaultDebug }
 	, m_keyboard{}
 	, m_hasFocus{}
 	, m_mouse{}
 	, m_osParameters{ osParameters }
 	, m_assetPaths{ new rm::AssetPaths }
+	, m_block{}
 {
 	m_debug->SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler( this ) } );
+	m_block = m_debug->GetLogger()->CreateBlock( "WindowsOS" );
 }
 
 WindowsOS::~WindowsOS()
@@ -198,7 +200,7 @@ void WindowsOS::BuildRenderers( std::string title )
 
 void WindowsOS::Startup()
 {
-	auto block = Debug()->MakeBlock( "OS Startup" );
+	auto block{ m_block->SubBlock( "Startup" ) };
 
 	auto keyboardItr = m_game->GetInputManager()->FindSource( "Keyboard" );
 	if( keyboardItr )
@@ -497,6 +499,7 @@ const me::os::OSParameters * WindowsOS::GetOSParameters() const
 
 me::os::IExtension::ptr WindowsOS::CreateExtension( unify::Path source, const qxml::Element * element )
 {
-	auto block = Debug()->MakeBlock( "WindowsOS::CreateExtention( \"" + source.ToString() + "\" )" );
-	return me::os::IExtension::ptr{ new Extension( GetGame(), source, element ) };
+	m_block->SubBlock( "CreateExtention \"" + source.ToString() + "\"" );
+	auto extension = me::os::IExtension::ptr{ new Extension( GetGame(), source, element ) };
+	return extension;
 }

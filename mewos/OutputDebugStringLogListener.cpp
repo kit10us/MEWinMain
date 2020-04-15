@@ -29,7 +29,7 @@ OutputDebugStringLogListener::~OutputDebugStringLogListener()
 }
 
 
-void OutputDebugStringLogListener::LogEvent( const kit::LogEvent* event )
+void OutputDebugStringLogListener::LogEvent( const kit::debug::LogEvent* event )
 {
 	OutputDebugStringA( (event->text + "\n").c_str() );
 }

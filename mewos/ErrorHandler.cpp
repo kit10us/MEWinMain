@@ -2,7 +2,6 @@
 // All Rights Reserved
 
 #include <mewos/WindowsOS.h>
-#include <mewos/Debug.h>
 #include <mewos/ErrorHandler.h>
 #include <unify/Exception.h>
 #include <Windows.h>
@@ -214,14 +213,14 @@ ErrorHandler::ErrorHandler( mewos::WindowsOS* os )
 {
 }
 
-me::debug::ReportErrorResult ErrorHandler::ReportError( me::debug::ErrorLevel level, std::string source, std::string error, bool canContinue, bool canRetry )
+me::debug::ReportErrorResult ErrorHandler::ReportError( me::debug::ErrorLevel level, std::string error, bool canContinue, bool canRetry )
 {
 	HINSTANCE hInstance = (HINSTANCE)m_os->GetOSParameters()->hInstance;
 	HINSTANCE hPrevInstance = (HINSTANCE)m_os->GetOSParameters()->hPrevInstance;
 	LPSTR lpszCmdLine = (LPSTR)m_os->GetOSParameters()->cmdLine.c_str();
 	int nCmdShow = (int)m_os->GetOSParameters()->nCmdShow;
 
-	std::string errorOutput{ m_os->Debug()->GetLogger()->GetBlockText() + error };
+	std::string errorOutput{ error };
 	int result = ShowFailureWindow( hInstance, hPrevInstance, lpszCmdLine, nCmdShow, errorOutput, true, canRetry, canContinue );
 	switch ( result )
 	{

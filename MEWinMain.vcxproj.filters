@@ -6,9 +6,6 @@
     <ClCompile Include="mewos\WindowsOS.cpp">
       <Filter>mewos</Filter>
     </ClCompile>
-    <ClCompile Include="mewos\Debug.cpp">
-      <Filter>mewos</Filter>
-    </ClCompile>
     <ClCompile Include="mewos\Extension.cpp">
       <Filter>mewos</Filter>
     </ClCompile>
@@ -23,9 +20,6 @@
     <ClInclude Include="WndProc.h" />
     <ClInclude Include="MEWinMain.h" />
     <ClInclude Include="mewos\WindowsOS.h">
-      <Filter>mewos</Filter>
-    </ClInclude>
-    <ClInclude Include="mewos\Debug.h">
       <Filter>mewos</Filter>
     </ClInclude>
     <ClInclude Include="mewos\Extension.h">

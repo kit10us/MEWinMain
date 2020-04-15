@@ -27,6 +27,20 @@ namespace mewos
 {
 	class WindowsOS : public mewos::IWindowsOS
 	{
+		me::game::IGame* m_game;
+		me::debug::IDebug::ptr m_debug;
+		me::render::IRendererFactory::ptr m_rendererFactory;
+		std::string m_name;
+		me::input::IInputDevice* m_keyboard;
+		me::input::IInputDevice* m_mouse;
+		bool m_hasFocus;
+		std::list< HWND > m_childHandles; // Handles to be serviced.
+		std::vector< me::render::Display > m_pendingDisplays;
+		std::vector< me::render::IRenderer::ptr > m_renderers;
+		me::os::OSParameters m_osParameters;
+		rm::AssetPaths::ptr m_assetPaths;
+		kit::debug::IBlock::ptr m_block;
+
 	public:
 		WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters );
 		virtual ~WindowsOS();
@@ -55,19 +69,5 @@ namespace mewos
 		me::os::IExtension::ptr CreateExtension( unify::Path source, const qxml::Element * element ) override;
 		void Startup() override;
 		void Shutdown() override;
-
-	private:
-		me::game::IGame * m_game;
-		me::debug::IDebug::ptr m_debug;
-		me::render::IRendererFactory::ptr m_rendererFactory;
-		std::string m_name;
-		me::input::IInputDevice * m_keyboard;
-		me::input::IInputDevice * m_mouse;
-		bool m_hasFocus;
-		std::list< HWND > m_childHandles; // Handles to be serviced.
-		std::vector< me::render::Display > m_pendingDisplays;
-		std::vector< me::render::IRenderer::ptr > m_renderers;
-		me::os::OSParameters m_osParameters;
-		rm::AssetPaths::ptr m_assetPaths;
 	};
 }

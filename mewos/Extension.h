@@ -12,14 +12,15 @@ namespace mewos
 {
 	class Extension : public me::os::IExtension
 	{
+		unify::Path m_source;
+		void* m_moduleHandle;
+		kit::debug::IBlock::ptr m_block;
+
 	public:
 		Extension( me::game::IGame * gameInstance, unify::Path source, const qxml::Element * element );
 		virtual ~Extension();
 
 	public: // me::os::IExtension
 
-	private:
-		unify::Path m_source;
-		void* m_moduleHandle;
 	};
 }
