@@ -16,10 +16,6 @@
 using namespace me;
 using namespace mewos;
 
-#ifdef GetCommandLine
-#undef GetCommandLine
-#endif
-
 WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters )
 	: m_game{ game }
 	, m_debug{ new me::debug::DefaultDebug }

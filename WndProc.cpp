@@ -5,9 +5,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-#ifdef GetCommandLine
-#undef GetCommandLine
-#endif // GetCommandLine
+
 #ifdef GetObject
 #undef GetObject
 #endif
@@ -25,6 +23,7 @@ extern "C" me::game::Game * GetGameInstance();
 extern "C"
 LRESULT CALLBACK WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lParam )
 {
-	auto result = GetGameInstance()->GetOS()->Feed( "OS", (void*)&me::os::win::OSFood( (me::os::win::HWnd)handle, message, (me::os::win::WParam)wParam, (me::os::win::LParam)lParam ) );
+	auto osFood = me::os::win::OSFood((me::os::win::HWnd)handle, message, (me::os::win::WParam)wParam, (me::os::win::LParam)lParam);
+	auto result = GetGameInstance()->GetOS()->Feed( "OS", (void*)&osFood );
 	return (LRESULT)result;
 }

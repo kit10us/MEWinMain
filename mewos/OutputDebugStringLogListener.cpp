@@ -5,9 +5,7 @@
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-#ifdef GetCommandLine
-#undef GetCommandLine
-#endif // GetCommandLine
+
 #ifdef GetObject
 #undef GetObject
 #endif
