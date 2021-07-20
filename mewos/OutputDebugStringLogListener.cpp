@@ -31,3 +31,8 @@ void OutputDebugStringLogListener::LogEvent( const kit::debug::LogEvent* event )
 {
 	OutputDebugStringA( (event->text + "\n").c_str() );
 }
+
+unify::Path OutputDebugStringLogListener::GetPath() const
+{
+	return {};
+}

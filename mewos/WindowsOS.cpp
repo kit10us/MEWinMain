@@ -18,7 +18,7 @@ using namespace mewos;
 
 WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters )
 	: m_game{ game }
-	, m_debug{ new me::debug::DefaultDebug }
+	, m_debug{ new me::debug::DefaultDebug{osParameters.GetRunPath(), unify::Path{"default"} } }
 	, m_keyboard{}
 	, m_hasFocus{}
 	, m_mouse{}
