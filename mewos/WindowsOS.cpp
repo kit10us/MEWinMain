@@ -4,6 +4,7 @@
 #pragma once
 
 #include <mewos/WindowsOS.h>
+#include <mewos/Environment.h>
 #include <mewos/Extension.h>
 #include <mewos/ErrorHandler.h>
 #include <me/debug/DefaultDebug.h>
@@ -12,12 +13,14 @@
 #include <unify/Exception.h>
 #include <unify/Path.h>
 #include <shellapi.h>
+#include <WinUser.h>
 
 using namespace me;
 using namespace mewos;
 
 WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters )
-	: m_game{ game }
+	: m_environment{ std::make_shared< Environment >() }
+	, m_game{ game }
 	, m_debug{ new me::debug::DefaultDebug{osParameters.GetRunPath(), unify::Path{"default"} } }
 	, m_keyboard{}
 	, m_hasFocus{}
@@ -26,7 +29,7 @@ WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters 
 	, m_assetPaths{ new rm::AssetPaths }
 	, m_block{}
 {
-	m_debug->SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler( this ) } );
+	//m_debug->SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler( this ) } );
 	m_block = m_debug->GetLogger()->CreateBlock( "WindowsOS" );
 }
 
@@ -95,6 +98,7 @@ void WindowsOS::CreateDisplay( render::Display display, std::string title )
 
 		if( !handle )
 		{
+			auto last_error = GetLastError();
 			throw exception::FailedToCreate( "Failed to create window!" );
 		}
 
@@ -134,6 +138,11 @@ HWND WindowsOS::GetHandle() const
 // me::os::IOS
 /////////////////////////////////////////////////
 
+me::os::IEnvironment::weak_ptr WindowsOS::GetEnvironment() const
+{
+	return m_environment;
+}
+
 me::game::IGame * WindowsOS::GetGame()
 {
 	return m_game;
@@ -153,7 +162,8 @@ void * WindowsOS::Feed( std::string target, void * data )
 {
 	os::win::OSFood * food = ( os::win::OSFood* )data;
 
-	return (void*)WndProc( (HWND)food->handle, (UINT)food->message, (WPARAM)food->wParam, (LPARAM)food->lParam );
+	LRESULT lresult = WndProc((HWND)food->handle, (UINT)food->message, (WPARAM)food->wParam, (LPARAM)food->lParam);
+	return (void*)lresult;
 }
 
 void WindowsOS::AddDisplay( render::Display display )
@@ -161,12 +171,12 @@ void WindowsOS::AddDisplay( render::Display display )
 	m_pendingDisplays.push_back( display );
 }
 
-int WindowsOS::RendererCount() const
+size_t WindowsOS::RendererCount() const
 {
 	return m_renderers.size();
 }
 
-me::render::IRenderer * WindowsOS::GetRenderer( int index ) const
+me::render::IRenderer * WindowsOS::GetRenderer( size_t index ) const
 {
 	return m_renderers[index].get();
 }
@@ -222,6 +232,16 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 
 	switch( message )
 	{
+	case WM_NCCREATE:
+		{
+			// Extra code is for testing.
+			CREATESTRUCT* createstruct = (CREATESTRUCT*)(lParam);
+			auto ret = DefWindowProc(handle, message, wParam, lParam);
+			auto last_error = GetLastError();
+			return ret;
+		}
+		break;
+
 	case WM_CLOSE: // Fall through to WM_DESTROY...
 	case WM_DESTROY:
 		gameInstance.Quit();
@@ -231,7 +251,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( m_osParameters.handle == handle )
 			{
@@ -247,7 +267,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -267,7 +287,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -287,7 +307,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -307,7 +327,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -327,7 +347,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -347,7 +367,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 	{
 		if( m_mouse == nullptr ) break;
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -368,7 +388,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 		if( m_mouse == nullptr ) break;
 
 		short zDelta = GET_WHEEL_DELTA_WPARAM( wParam );
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{
@@ -404,7 +424,7 @@ LRESULT WindowsOS::WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lPa
 		RECT clientRect;
 		GetClientRect( handle, &clientRect );
 
-		for( int renderer = 0; renderer < RendererCount(); ++renderer )
+		for( size_t renderer = 0; renderer < RendererCount(); ++renderer )
 		{
 			if( GetRenderer( renderer )->GetDisplay().GetHandle() == handle )
 			{

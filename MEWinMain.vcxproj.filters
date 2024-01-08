@@ -15,6 +15,9 @@
     <ClCompile Include="mewos\ErrorHandler.cpp">
       <Filter>mewos</Filter>
     </ClCompile>
+    <ClCompile Include="mewos\Environment.cpp">
+      <Filter>mewos</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WndProc.h" />
@@ -25,13 +28,13 @@
     <ClInclude Include="mewos\Extension.h">
       <Filter>mewos</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\MEWinMain\mewos\IWindowsOS.h">
-      <Filter>mewos</Filter>
-    </ClInclude>
     <ClInclude Include="mewos\OutputDebugStringLogListener.h">
       <Filter>mewos</Filter>
     </ClInclude>
     <ClInclude Include="mewos\ErrorHandler.h">
+      <Filter>mewos</Filter>
+    </ClInclude>
+    <ClInclude Include="mewos\Environment.h">
       <Filter>mewos</Filter>
     </ClInclude>
   </ItemGroup>

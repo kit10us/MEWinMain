@@ -35,6 +35,7 @@ namespace mewos
 		me::os::OSParameters m_osParameters;
 		rm::AssetPaths::ptr m_assetPaths;
 		kit::debug::IBlock::ptr m_block;
+		me::os::IEnvironment::ptr m_environment;
 
 	public:
 		WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters );
@@ -48,13 +49,14 @@ namespace mewos
 		LRESULT WndProc( HWND handle, UINT message, WPARAM wParam, LPARAM lParam );
 
 	public: // me::os::IOS
+		me::os::IEnvironment::weak_ptr GetEnvironment() const override;
 		me::game::IGame * GetGame() override;
 		me::debug::IDebug * Debug() override;
 		const me::debug::IDebug * Debug() const override;
 		void * Feed( std::string target, void * data ) override;
 		void AddDisplay( me::render::Display display );
-		int RendererCount() const override;
-		me::render::IRenderer * GetRenderer( int index ) const override;
+		size_t RendererCount() const override;
+		me::render::IRenderer * GetRenderer( size_t index ) const override;
 		void SetHasFocus( bool hasFocus ) override;
 		bool GetHasFocus() const override;
 		void SetRenderFactory( me::render::IRendererFactory::ptr renderFactory ) override;

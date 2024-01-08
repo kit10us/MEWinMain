@@ -171,5 +171,5 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 	}
 
  
-    return msg.wParam; 
+    return (int)msg.wParam; 
 } 

@@ -10,6 +10,15 @@
 
 #include <shellapi.h>
 
+#if defined(GWL_HINSTANCE)
+#define REAL_GWL_HINSTANCE GWL_HINSTANCE
+#elif defined(GWLP_HINSTANCE)
+#define REAL_GWL_HINSTANCE GWLP_HINSTANCE
+#else
+#error No architecture support for GWL_HINSTANCE nor for GWLP_HINSTANCE
+#endif
+
+
 using namespace mewos;
 
 int s_failureWindowResult;
@@ -26,7 +35,7 @@ LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, L
 	{
 	case WM_CREATE:
 	{
-		HINSTANCE hInstace = (HINSTANCE)GetWindowLong( hWnd, GWL_HINSTANCE );
+		HINSTANCE hInstance = (HINSTANCE)GetWindowLong( hWnd, REAL_GWL_HINSTANCE );
 
 		const int padding = 5;
 		RECT parentRect{};
@@ -45,7 +54,7 @@ LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, L
 			padding, top, childWidth, editHeight,
 			hWnd,
 			(HMENU)ID_EDIT_MESSAGE,
-			hInstace,
+			hInstance,
 			0 );
 		top += editHeight + padding;
 
@@ -57,7 +66,7 @@ LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, L
 			buttonLeft, top, buttonWidth, buttonHeight,
 			hWnd,
 			(HMENU)ID_BUTTON_ABORT,
-			hInstace,
+			hInstance,
 			0 );
 		buttonLeft += buttonWidth + padding;
 
@@ -68,7 +77,7 @@ LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, L
 			buttonLeft, top, buttonWidth, buttonHeight,
 			hWnd,
 			(HMENU)ID_BUTTON_RETRY,
-			hInstace,
+			hInstance,
 			0 );
 		buttonLeft += buttonWidth + padding;
 
@@ -79,7 +88,7 @@ LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, L
 			buttonLeft, top, buttonWidth, buttonHeight,
 			hWnd,
 			(HMENU)ID_BUTTON_IGNORE,
-			hInstace,
+			hInstance,
 			0 );
 		buttonLeft += buttonWidth + padding;
 		top += buttonHeight;
