@@ -122,7 +122,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 	while( stage != Stage::Exiting )
 	{
 		bool allowRetry{ false };
-		try
+		//try
 		{
 			if( stage == Stage::Initializing )
 			{
@@ -154,6 +154,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 				gameInstance->Draw();
 			}
 		}
+		/*
 		catch( me::exception::Handled & )
 		{
 			return -1;
@@ -168,6 +169,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "Unknown exception", false, false );
 			return -1;
 		}
+		*/
 	}
 
  

@@ -4,21 +4,13 @@
 #include <mewos/WindowsOS.h>
 #include <mewos/ErrorHandler.h>
 #include <unify/Exception.h>
+#include <port/win/general.h>
 #include <Windows.h>
 #include <fstream>
 #include <cassert>
 
 #include <shellapi.h>
-
-#if defined(GWL_HINSTANCE)
-#define REAL_GWL_HINSTANCE GWL_HINSTANCE
-#elif defined(GWLP_HINSTANCE)
-#define REAL_GWL_HINSTANCE GWLP_HINSTANCE
-#else
-#error No architecture support for GWL_HINSTANCE nor for GWLP_HINSTANCE
-#endif
-
-
+	
 using namespace mewos;
 
 int s_failureWindowResult;
@@ -35,7 +27,7 @@ LRESULT CALLBACK WndProcFailureWindow( HWND hWnd, UINT message, WPARAM wParam, L
 	{
 	case WM_CREATE:
 	{
-		HINSTANCE hInstance = (HINSTANCE)GetWindowLong( hWnd, REAL_GWL_HINSTANCE );
+		HINSTANCE hInstance = (HINSTANCE)COMPAT_GetWindowLong( hWnd, COMPAT_GWL_HINSTANCE );
 
 		const int padding = 5;
 		RECT parentRect{};
