@@ -15,7 +15,7 @@ namespace mewos
 		OutputDebugStringLogListener();
 		~OutputDebugStringLogListener();
 
-		void LogEvent( const kit::debug::LogEvent* event ) override;
+		bool LogEvent( const kit::debug::LogEvent* event ) override;
 		unify::Path GetPath() const override;
 	};
 }

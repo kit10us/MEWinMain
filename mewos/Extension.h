@@ -7,6 +7,7 @@
 #include <me/os/IExtension.h>
 #include <qxml/Element.h>
 #include <unify/Path.h>
+#include <unify/Result.h>
 
 namespace mewos
 {
@@ -17,7 +18,7 @@ namespace mewos
 		kit::debug::IBlock::ptr m_block;
 
 	public:
-		Extension( me::game::IGame * gameInstance, unify::Path source, const qxml::Element * element );
+		Extension(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element, unify::Result::ptr resukt = {});
 		virtual ~Extension();
 
 	public: // me::os::IExtension

@@ -3,18 +3,7 @@
 
 #include <mewos/OutputDebugStringLogListener.h>
 
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
-
-#ifdef GetObject
-#undef GetObject
-#endif
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
+#include <port/win/Windows.h>
 
 using namespace mewos;
 
@@ -27,9 +16,10 @@ OutputDebugStringLogListener::~OutputDebugStringLogListener()
 }
 
 
-void OutputDebugStringLogListener::LogEvent( const kit::debug::LogEvent* event )
+bool OutputDebugStringLogListener::LogEvent( const kit::debug::LogEvent* event )
 {
 	OutputDebugStringA( (event->text + "\n").c_str() );
+	return true;
 }
 
 unify::Path OutputDebugStringLogListener::GetPath() const

@@ -10,19 +10,7 @@
 #include <list>
 #include <vector>
 
-#define WINDOWS_LEAN_AND_MEAN
-#include <Windows.h>
-
-// Undefine Microsoft clashing defines.
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-
-/*
-#ifdef GetCommandLine
-#undef GetCommandLine
-#endif
-*/
+#include <port/win/Windows.h>
 
 namespace mewos
 {

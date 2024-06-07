@@ -6,21 +6,8 @@
 #include <me/game/Game.h>
 #include <me/debug/IDebug.h>
 #include <me/exception/Handled.h>
+
 #include <WndProc.h>
-
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
-
-#ifdef GetObject
-#undef GetObject
-#endif
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min	
-#endif
-
 #include <shellapi.h>
 
 extern "C" LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );

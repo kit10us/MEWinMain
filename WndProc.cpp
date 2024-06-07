@@ -3,18 +3,7 @@
 
 #include <me/game/Game.h>
 
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
-
-#ifdef GetObject
-#undef GetObject
-#endif
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
+#include <port/win/Windows.h>
 
 #include <shellapi.h>
 
