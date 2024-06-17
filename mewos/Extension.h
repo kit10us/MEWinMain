@@ -18,7 +18,7 @@ namespace mewos
 		kit::debug::IBlock::ptr m_block;
 
 	public:
-		Extension(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element, unify::Result::ptr resukt = {});
+		Extension(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element);
 		virtual ~Extension();
 
 	public: // me::os::IExtension
