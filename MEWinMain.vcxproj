@@ -131,7 +131,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>PORT_WINDOWS;PORT_X64;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>.;$(ProjectDir)..\unify;$(ProjectDir)..\qxml;$(ProjectDir)..\Portability;$(ProjectDir)..\QJson;$(ProjectDir)..\kitlogger;$(ProjectDir)..\ResourceManager;$(ProjectDir)..\MercuryEngine;$(ProjectDir)..\packages;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;$(ProjectDir)..\unify;$(ProjectDir)..\qxml;$(ProjectDir)..\Portability;$(ProjectDir)..\QJson;$(ProjectDir)..\kitlogger;$(ProjectDir)..\ResourceManager;$(ProjectDir)..\MercuryEngine;$(ProjectDir)..\packages;$(ProjectDir)..\interop;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
