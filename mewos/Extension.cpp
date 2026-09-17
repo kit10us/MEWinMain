@@ -4,41 +4,58 @@
 #include <mewos/Extension.h>
 #include <me/exception/FileNotFound.h>
 
-#include <port/win/Windows.h>
+#include <port/win/general.h>
 
 using namespace mewos;
 
 typedef bool( __cdecl *LoaderFunction )(me::game::IGame *, const qxml::Element * element);
 
+<<<<<<< HEAD
 Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element)
+=======
+Extension::Extension()
+>>>>>>> temp
 	: m_moduleHandle{}
-	, m_block{ gameInstance->Debug()->GetLogger()->CreateBlock( "Extension \"" + source.Filename() + "\"" ) }
+{
+}
+
+unify::Result<> Extension::Load(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element)
 {
 	using namespace me;
-	using Result = unify::Result;
-
+	auto block{ gameInstance->Debug()->GetLogger()->CreateBlock( "Extension \"" + source.Filename() + "\" loading" ) };
 
 	auto debug = gameInstance->Debug();
-	auto block{ m_block->SubBlock( "ctor" ) };
 
 	m_source = source;
 	if( !m_source.Exists() )
 	{
+<<<<<<< HEAD
 		debug->ReportError(debug::ErrorLevel::Failure, "File not found " + m_source.ToString() );
+=======
+		return unify::Failure("File not found " + m_source.ToString() );
+>>>>>>> temp
 	}
 
 	block->Log( "Loading library module." );
 	m_moduleHandle = LoadLibraryA( m_source.ToString().c_str() );
 	if( !m_moduleHandle )
 	{
-		DWORD errorCode = GetLastError();
+		uint32_t errorCode = GetLastError();
 		if( errorCode == ERROR_MOD_NOT_FOUND )
 		{
+<<<<<<< HEAD
 			debug->ReportError(debug::ErrorLevel::Failure, "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured due to likely missing dependency (missing another DLL)!" );
 		}
 		else
 		{
 			debug->ReportError(debug::ErrorLevel::Failure, "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + unify::Cast< std::string >( errorCode ) + ")!" );
+=======
+			return unify::Failure("Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured due to likely missing dependency (missing another DLL)!" );
+		}
+		else
+		{
+			return unify::Failure("Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + *unify::ToString( errorCode ) + ")!" );
+>>>>>>> temp
 		}
 	}
 
@@ -57,10 +74,19 @@ Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const q
 		block->Log( "Executing loader" );
 		loader( gameInstance, element );
 	}
+	return {};
+}
+
+void Extension::Unload()
+{
+	if (m_moduleHandle)
+	{
+		FreeLibrary( (HMODULE)m_moduleHandle );
+		m_moduleHandle = 0;
+	}
 }
 
 Extension::~Extension()
 {
-	FreeLibrary( (HMODULE)m_moduleHandle );
-	m_moduleHandle = 0;
+	Unload();
 }

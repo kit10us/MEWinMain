@@ -10,7 +10,7 @@
 #include <list>
 #include <vector>
 
-#include <port/win/Windows.h>
+#include <port/win/general.h>
 
 namespace mewos
 {

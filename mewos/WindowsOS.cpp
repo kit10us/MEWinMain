@@ -73,7 +73,7 @@ void WindowsOS::CreateDisplay( render::Display display, std::string title )
 
 		if( isPrimary )
 		{
-			wc.lpszMenuName = L"MainMenu";
+			wc.lpszMenuName = L"MainMenu"; // SAS TODO (many): Need portability.
 			wc.lpszClassName = L"MainWndClass";
 		}
 		else		    // TODO: This worked, yet is dodgy...
@@ -178,6 +178,10 @@ size_t WindowsOS::RendererCount() const
 
 me::render::IRenderer * WindowsOS::GetRenderer( size_t index ) const
 {
+	if (m_renderers.empty())
+	{
+		return nullptr;
+	}
 	return m_renderers[index].get();
 }
 
@@ -516,6 +520,13 @@ const me::os::OSParameters * WindowsOS::GetOSParameters() const
 me::os::IExtension::ptr WindowsOS::CreateExtension( unify::Path source, const qxml::Element * element )
 {
 	m_block->SubBlock( "CreateExtention \"" + source.ToString() + "\"" );
-	auto extension = me::os::IExtension::ptr{ new Extension( GetGame(), source, element ) };
+	//auto extension = me::os::IExtension::ptr{ new Extension{( GetGame(), source, element ) };
+	auto extension = std::make_shared<Extension>();
+	auto result = extension->Load(GetGame(), source, element);
+	if (!result)
+	{
+		m_block->Log("Failed to load extension: " + result.Message());
+		return {};
+	}
 	return extension;
 }
