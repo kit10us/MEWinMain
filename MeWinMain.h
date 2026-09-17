@@ -5,4 +5,4 @@
 
 // Headers is used to pull in the MEWinMain.lib.
 
-#pragma comment( lib, "MEWinMain" )
+#pragma comment( lib, "MEWinMain" ) // SAS TODO: Move to project file/settings.

@@ -152,20 +152,22 @@ int ShowFailureWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszC
 	HWND activeWindow = GetActiveWindow();
 	EnableWindow( activeWindow, false );
 
-	const wchar_t* CLASS_NAME{ L"MercuryFailureWindowClass" };
+	// SAS TODO: Need a portabile method to support both wchar_t* and LPCSTR.
+	const wchar_t CLASS_NAME_LPWSTR[]{ L"MercuryFailureWindowClass" };
+	const char CLASS_NAME_LPSTR[]{ "MercuryFailureWindowClass" };
 
 	WNDCLASS wc{};
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 
 	wc.lpfnWndProc = (WNDPROC)WndProcFailureWindow;
 	wc.hInstance = hInstance;
-	wc.lpszClassName = L"MercuryFailureWindowClass";
+	wc.lpszClassName = CLASS_NAME_LPWSTR;//L"MercuryFailureWindowClass";
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
 
 	RegisterClass( &wc );
 
 	HWND hWnd = CreateWindowW(
-		CLASS_NAME,
+		CLASS_NAME_LPWSTR,
 		L"Mercury failure",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_BORDER | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT,

@@ -15,11 +15,14 @@ namespace mewos
 	{
 		unify::Path m_source;
 		void* m_moduleHandle;
-		kit::debug::IBlock::ptr m_block;
 
 	public:
-		Extension(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element, unify::Result::ptr resukt = {});
+		Extension();
 		virtual ~Extension();
+
+		unify::Result<> Load(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element);
+
+		void Unload();
 
 	public: // me::os::IExtension
 

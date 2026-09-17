@@ -1,3 +1,4 @@
 .vs/
 *.log
 *.vcxproj.user
+x64/
