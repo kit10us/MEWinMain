@@ -106,57 +106,56 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 		Exiting
 	} stage{ Stage::Initializing };
 
+	unify::Result<> success{};
 	while( stage != Stage::Exiting )
 	{
 		bool allowRetry{ false };
-		//try
+		if( stage == Stage::Initializing )
 		{
-			if( stage == Stage::Initializing )
+			allowRetry = true;
+			auto result = gameInstance->Initialize( os );
+			if (!result)
 			{
-				allowRetry = true;
-				gameInstance->Initialize( os );
-				gameInstance->Debug()->GetLogger()->Log( "After exiting init." );
-				stage = Stage::Running; 
+				success = result;
+				gameInstance->Debug()->GetLogger()->Log( "MEWinMAin game initialization failure: \"" + result.Message() + "\"!" );
+				break;
 			}
+			gameInstance->Debug()->GetLogger()->Log( "After exiting init." );
+			stage = Stage::Running; 
+		}
 
-			if( stage == Stage::Running )
+		if( stage == Stage::Running )
+		{
+			allowRetry = false;
+			while( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) == 1 )
 			{
-				allowRetry = false;
-				while( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) == 1 )
-				{
-					if( msg.message == WM_QUIT )
-					{
-						break;
-					}
-					TranslateMessage( &msg );
-					DispatchMessage( &msg );
-				}
-
-				gameInstance->Tick();
-				if( gameInstance->IsQuitting() )
+				if( msg.message == WM_QUIT )
 				{
 					break;
 				}
-
-				gameInstance->Draw();
+				TranslateMessage( &msg );
+				DispatchMessage( &msg );
 			}
+
+			gameInstance->Tick();
+			if( gameInstance->IsQuitting() )
+			{
+				break;
+			}
+
+			gameInstance->Draw();
 		}
-		/*
-		catch( me::exception::Handled & )
-		{
-			return -1;
-		}
-		catch( std::exception exception )
-		{
-			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, exception.what(), false, false );
-			return -1;
-		}
-		catch( ... )
-		{
-			gameInstance->Debug()->ReportError( me::debug::ErrorLevel::Engine, "Unknown exception", false, false );
-			return -1;
-		}
-		*/
+	}
+
+	if (!success)
+	{
+		// NOTE: Our goal is to never hit hear in release.
+        OutputDebugStringA( "[" );
+        OutputDebugStringA( "Mercury Failure: " );
+        OutputDebugStringA( success.Message().c_str() );
+        OutputDebugStringA( "]\n" );
+		MessageBoxA( 0, success.Message().c_str(), "Mercury Failure", MB_ICONEXCLAMATION );
+		return -1;
 	}
 
  

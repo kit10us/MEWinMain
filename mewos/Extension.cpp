@@ -10,11 +10,7 @@ using namespace mewos;
 
 typedef bool( __cdecl *LoaderFunction )(me::game::IGame *, const qxml::Element * element);
 
-<<<<<<< HEAD
-Extension::Extension( me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element)
-=======
 Extension::Extension()
->>>>>>> temp
 	: m_moduleHandle{}
 {
 }
@@ -29,11 +25,7 @@ unify::Result<> Extension::Load(me::game::IGame* gameInstance, unify::Path sourc
 	m_source = source;
 	if( !m_source.Exists() )
 	{
-<<<<<<< HEAD
-		debug->ReportError(debug::ErrorLevel::Failure, "File not found " + m_source.ToString() );
-=======
 		return unify::Failure("File not found " + m_source.ToString() );
->>>>>>> temp
 	}
 
 	block->Log( "Loading library module." );
@@ -43,19 +35,11 @@ unify::Result<> Extension::Load(me::game::IGame* gameInstance, unify::Path sourc
 		uint32_t errorCode = GetLastError();
 		if( errorCode == ERROR_MOD_NOT_FOUND )
 		{
-<<<<<<< HEAD
-			debug->ReportError(debug::ErrorLevel::Failure, "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured due to likely missing dependency (missing another DLL)!" );
-		}
-		else
-		{
-			debug->ReportError(debug::ErrorLevel::Failure, "Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + unify::Cast< std::string >( errorCode ) + ")!" );
-=======
 			return unify::Failure("Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured due to likely missing dependency (missing another DLL)!" );
 		}
 		else
 		{
-			return unify::Failure("Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + *unify::ToString( errorCode ) + ")!" );
->>>>>>> temp
+			return unify::Failure("Extension \"" + m_source.ToString() + "\" loaded, however, a failure occured (error code: " + unify::ToString( errorCode ) + ")!" );
 		}
 	}
 

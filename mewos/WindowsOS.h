@@ -58,7 +58,7 @@ namespace mewos
 		rm::AssetPaths::ptr GetAssetPaths() override;
 		const me::os::OSParameters * GetOSParameters() const override;
 		me::os::IExtension::ptr CreateExtension( unify::Path source, const qxml::Element * element ) override;
-		void Startup() override;
+		unify::Result<> Startup() override;
 		void Shutdown() override;
 	};
 }

@@ -17,11 +17,7 @@ namespace mewos
 		void* m_moduleHandle;
 
 	public:
-<<<<<<< HEAD
-		Extension(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element);
-=======
 		Extension();
->>>>>>> temp
 		virtual ~Extension();
 
 		unify::Result<> Load(me::game::IGame* gameInstance, unify::Path source, const qxml::Element* element);

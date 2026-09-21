@@ -208,7 +208,7 @@ void WindowsOS::BuildRenderers( std::string title )
 	// TODO: DragAcceptFiles( this->GetHWnd(), true );
 }
 
-void WindowsOS::Startup()
+unify::Result<> WindowsOS::Startup()
 {
 	auto block{ m_block->SubBlock( "Startup" ) };
 
@@ -223,6 +223,7 @@ void WindowsOS::Startup()
 	{
 		m_mouse = mouseItr.get();
 	}
+	return unify::Success{};
 }
 
 void WindowsOS::Shutdown()
