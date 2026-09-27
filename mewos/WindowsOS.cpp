@@ -21,7 +21,7 @@ using namespace mewos;
 WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters )
 	: m_environment{ std::make_shared< Environment >() }
 	, m_game{ game }
-	, m_debug{ new me::debug::DefaultDebug{osParameters.GetRunPath(), unify::Path{"default"} } }
+	, m_debug{}
 	, m_keyboard{}
 	, m_hasFocus{}
 	, m_mouse{}
@@ -30,6 +30,11 @@ WindowsOS::WindowsOS( me::game::IGame * game, me::os::OSParameters osParameters 
 	, m_block{}
 {
 	//m_debug->SetErrorHandler( me::debug::IErrorHandler::ptr{ new ErrorHandler( this ) } );
+
+	auto default_debug = std::make_shared<me::debug::DefaultDebug>();
+	m_debug = default_debug;
+	auto result = default_debug->Create(osParameters.GetRunPath(), unify::Path{"default"});
+	
 	m_block = m_debug->GetLogger()->CreateBlock( "WindowsOS" );
 }
 
@@ -518,7 +523,7 @@ const me::os::OSParameters * WindowsOS::GetOSParameters() const
 	return &m_osParameters;
 }
 
-me::os::IExtension::ptr WindowsOS::CreateExtension( unify::Path source, const qxml::Element * element )
+unify::Result<me::os::IExtension::ptr> WindowsOS::CreateExtension( unify::Path source, const qxml::Element * element )
 {
 	m_block->SubBlock( "CreateExtention \"" + source.ToString() + "\"" );
 	//auto extension = me::os::IExtension::ptr{ new Extension{( GetGame(), source, element ) };
@@ -526,8 +531,7 @@ me::os::IExtension::ptr WindowsOS::CreateExtension( unify::Path source, const qx
 	auto result = extension->Load(GetGame(), source, element);
 	if (!result)
 	{
-		m_block->Log("Failed to load extension: " + result.Message());
-		return {};
+		return unify::Failure{"Failed to load extension: " + result.Message()};
 	}
-	return extension;
+	return {extension};
 }

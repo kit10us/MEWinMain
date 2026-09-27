@@ -117,7 +117,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 			if (!result)
 			{
 				success = result;
-				gameInstance->Debug()->GetLogger()->Log( "MEWinMAin game initialization failure: \"" + result.Message() + "\"!" );
+				gameInstance->Debug()->GetLogger()->Log( "MEWinMain game initialization failure: \"" + result.Message() + "\"!" );
 				break;
 			}
 			gameInstance->Debug()->GetLogger()->Log( "After exiting init." );

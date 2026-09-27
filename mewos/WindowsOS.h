@@ -17,7 +17,9 @@ namespace mewos
 	class WindowsOS : public mewos::IWindowsOS
 	{
 		me::game::IGame* m_game;
+		
 		me::debug::IDebug::ptr m_debug;
+
 		me::render::IRendererFactory::ptr m_rendererFactory;
 		std::string m_name;
 		me::input::IInputDevice* m_keyboard;
@@ -57,7 +59,7 @@ namespace mewos
 		void BuildRenderers( std::string title ) override;
 		rm::AssetPaths::ptr GetAssetPaths() override;
 		const me::os::OSParameters * GetOSParameters() const override;
-		me::os::IExtension::ptr CreateExtension( unify::Path source, const qxml::Element * element ) override;
+		unify::Result<me::os::IExtension::ptr> CreateExtension( unify::Path source, const qxml::Element * element ) override;
 		unify::Result<> Startup() override;
 		void Shutdown() override;
 	};
